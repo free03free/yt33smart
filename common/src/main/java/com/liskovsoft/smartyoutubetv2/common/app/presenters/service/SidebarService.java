@@ -252,6 +252,7 @@ public class SidebarService implements ProfileChangeListener {
         mDefaultSections.put(R.string.header_blocked_channels, MediaGroup.TYPE_BLOCKED_CHANNELS);
         mDefaultSections.put(R.string.header_playlists, MediaGroup.TYPE_USER_PLAYLISTS);
         mDefaultSections.put(R.string.header_playlist_library, PlaylistLibraryService.SECTION_ID);
+        mDefaultSections.put(R.string.header_ajpanel, com.liskovsoft.smartyoutubetv2.common.app.presenters.ajpanel.AjPanelConfig.SECTION_ID);
         mDefaultSections.put(R.string.my_videos, MediaGroup.TYPE_MY_VIDEOS);
         mDefaultSections.put(R.string.playback_queue_category_title, MediaGroup.TYPE_PLAYBACK_QUEUE);
         mDefaultSections.put(R.string.header_settings, MediaGroup.TYPE_SETTINGS);
@@ -313,7 +314,33 @@ public class SidebarService implements ProfileChangeListener {
             libPrefs.edit().putBoolean("added", true).apply();
         }
 
+        // One-time: show the new "AJPanel" section for existing users (they can remove it afterwards)
+        android.content.SharedPreferences ajPrefs = mContext.getSharedPreferences("ajpanel_section", Context.MODE_PRIVATE);
+        if (!ajPrefs.getBoolean("added", false)) {
+            enableSection(com.liskovsoft.smartyoutubetv2.common.app.presenters.ajpanel.AjPanelConfig.SECTION_ID, true);
+            ajPrefs.edit().putBoolean("added", true).apply();
+        }
+
+        // AJPanel is an addition only: the Settings section must always stay in the sidebar, and AJPanel sits right before it
+        enableSection(MediaGroup.TYPE_SETTINGS, true);
+        placeAjPanelBeforeSettings();
+
         cleanupPinnedItems();
+    }
+
+    private void placeAjPanelBeforeSettings() {
+        int ajId = com.liskovsoft.smartyoutubetv2.common.app.presenters.ajpanel.AjPanelConfig.SECTION_ID;
+        int ajIdx = findPinnedItemIndex(ajId);
+        int settingsIdx = findPinnedItemIndex(MediaGroup.TYPE_SETTINGS);
+
+        if (ajIdx == -1 || settingsIdx == -1 || ajIdx == settingsIdx - 1) {
+            return;
+        }
+
+        Video aj = mPinnedItems.remove(ajIdx);
+        settingsIdx = findPinnedItemIndex(MediaGroup.TYPE_SETTINGS);
+        mPinnedItems.add(settingsIdx, aj);
+        persistState();
     }
 
     private void transferOldPinnedItems() {
