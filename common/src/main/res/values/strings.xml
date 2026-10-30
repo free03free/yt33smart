@@ -771,7 +771,6 @@
         <item quantity="other">%s seconds</item>
     </plurals>
     <string name="header_playlist_library">Playlist library</string>
-    <string name="header_ajpanel">AJPanel</string>
     <string name="playlist_library_mine">My playlists</string>
     <string name="playlist_library_saved">Saved playlists</string>
     <string name="saved_to_library">Saved to Playlist library</string>

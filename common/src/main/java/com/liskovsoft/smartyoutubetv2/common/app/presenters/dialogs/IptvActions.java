@@ -110,7 +110,7 @@ public final class IptvActions {
 
     // ------------------------------------------------------------------ add
 
-    public static void showAddDialog(Context context) {
+    private static void showAddDialog(Context context) {
         AppDialogPresenter presenter = AppDialogPresenter.instance(context);
 
         presenter.appendSingleButton(UiOptionItem.from("\uD83D\uDD17 " + s(context, R.string.iptv_add_from_link), option -> {
